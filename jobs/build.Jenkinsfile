@@ -176,11 +176,29 @@ lock(resource: "build-${params.STREAM}") {
             // for now, just use the PVC to keep cache.qcow2 in a stream-specific dir
             def cache_img = "/srv/prod/${params.STREAM}/cache.qcow2"
 
-            shwrap("""
-            cosa init --force --branch ${ref} --commit=${fcos_config_commit} ${src_config_url}
-            mkdir -p \$(dirname ${cache_img})
-            ln -s ${cache_img} cache/cache.qcow2
-            """)
+            // Needed until we backport https://github.com/coreos/coreos-assembler/pull/3036
+            if (params.STREAM == "master") {
+                shwrap("""
+                cosa init --force \
+                    --branch ${ref} \
+                    --yumrepos https://gitlab.cee.redhat.com/coreos/redhat-coreos \
+                    --commit=${fcos_config_commit} \
+                    ${src_config_url}
+                mkdir -p \$(dirname ${cache_img})
+                ln -s ${cache_img} cache/cache.qcow2
+                """)
+            } else {
+                shwrap("""
+                cosa init --force \
+                    --branch ${ref} \
+                    --commit=${fcos_config_commit} \
+                    ${src_config_url}
+                git clone --depth 1 --branch params.STREAM https://gitlab.cee.redhat.com/coreos/redhat-coreos src/yumrepos
+                cp -t src/config src/yumrepos/{*.repo,content_sets*.yaml}
+                mkdir -p \$(dirname ${cache_img})
+                ln -s ${cache_img} cache/cache.qcow2
+                """)
+            }
 
             // If the cache img is larger than 7G, then nuke it. Otherwise
             // it'll just keep growing and we'll hit ENOSPC. It'll get rebuilt.
