@@ -457,6 +457,9 @@ lock(resource: "build-${params.STREAM}") {
             }
         }
 
+        // Never use minimal for now
+        params.MINIMAL = false
+
         stage('Fork Multi-Arch Builds') {
             if (uploading) {
                 for (arch in params.ADDITIONAL_ARCHES.split()) {
