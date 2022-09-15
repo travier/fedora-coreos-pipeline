@@ -192,7 +192,7 @@ lock(resource: "build-${params.STREAM}") {
                     --branch ${ref} \
                     --commit=${fcos_config_commit} \
                     ${src_config_url}
-                git clone --depth 1 --branch params.STREAM https://gitlab.cee.redhat.com/coreos/redhat-coreos src/yumrepos
+                git clone --depth 1 --branch ${params.STREAM} https://gitlab.cee.redhat.com/coreos/redhat-coreos src/yumrepos
                 cp -t src/config src/yumrepos/{*.repo,content_sets*.yaml}
                 mkdir -p \$(dirname ${cache_img})
                 ln -s ${cache_img} cache/cache.qcow2
