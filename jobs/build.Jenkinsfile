@@ -175,7 +175,7 @@ lock(resource: "build-${params.STREAM}") {
         }
 
         def local_builddir = "/srv/devel/streams/${params.STREAM}"
-        def ref = params.STREAM
+        def ref = stream_info.branch
         def fcos_config_commit = shwrapCapture("git ls-remote ${src_config_url} ${ref} | cut -d \$'\t' -f 1")
 
         stage('Init') {
@@ -199,7 +199,7 @@ lock(resource: "build-${params.STREAM}") {
                     --branch ${ref} \
                     --commit=${fcos_config_commit} \
                     ${src_config_url}
-                git clone --depth 1 --branch params.STREAM https://gitlab.cee.redhat.com/coreos/redhat-coreos src/yumrepos
+                git clone --depth 1 --branch ${params.STREAM} https://gitlab.cee.redhat.com/coreos/redhat-coreos src/yumrepos
                 cp -t src/config src/yumrepos/{*.repo,content_sets*.yaml}
                 mkdir -p \$(dirname ${cache_img})
                 ln -s ${cache_img} cache/cache.qcow2
