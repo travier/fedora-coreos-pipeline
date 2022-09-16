@@ -58,7 +58,7 @@ properties([
                    description: 'Force AWS AMI replication for non-production'),
       string(name: 'COREOS_ASSEMBLER_IMAGE',
              description: 'Override coreos-assembler image to use',
-             defaultValue: "coreos-assembler:main",
+             defaultValue: "",
              trim: true),
       booleanParam(name: 'KOLA_RUN_SLEEP',
                    defaultValue: false,
@@ -93,6 +93,12 @@ def cosa_memory_request_mb = 6.5 * 1024 as Integer
 // them separately).
 def ncpus = ((cosa_memory_request_mb - 512) / 1024) as Integer
 
+string cosa_image = params.COREOS_ASSEMBLER_IMAGE
+if(cosa_image?.trim().length() == 0) {
+    cosa_image = stream_info.cosa_image
+}
+echo "Using COSA: ${cosa_image}"
+
 // the build pod runs most frequently and does the majority of the computation
 // so give it some healthy CPU shares
 pod = pod.replace("COREOS_ASSEMBLER_CPU_REQUEST", "${ncpus}")
@@ -100,7 +106,7 @@ pod = pod.replace("COREOS_ASSEMBLER_CPU_LIMIT", "${ncpus}")
 
 // substitute the right COSA image and mem request into the pod definition before spawning it
 pod = pod.replace("COREOS_ASSEMBLER_MEMORY_REQUEST", "${cosa_memory_request_mb}Mi")
-pod = pod.replace("COREOS_ASSEMBLER_IMAGE", params.COREOS_ASSEMBLER_IMAGE)
+pod = pod.replace("COREOS_ASSEMBLER_IMAGE", cosa_image)
 pod = pod.replace("JENKINS_AGENT_IMAGE_TAG", jenkins_agent_image_tag)
 
 def podYaml = readYaml(text: pod);
