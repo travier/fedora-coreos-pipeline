@@ -195,7 +195,7 @@ lock(resource: "build-${params.STREAM}-${params.ARCH}") {
         }
 
         def local_builddir = "/srv/devel/streams/${params.STREAM}"
-        def ref = params.STREAM
+        def ref = stream_info.branch
         def fcos_config_commit
         if (params.FCOS_CONFIG_COMMIT) {
             fcos_config_commit = params.FCOS_CONFIG_COMMIT
@@ -236,9 +236,27 @@ lock(resource: "build-${params.STREAM}-${params.ARCH}") {
             fi
             # sync over the send-ostree-import-request.py from the automation repo
             cosa remote-session sync {,:}/var/tmp/fcos-releng/coreos-ostree-importer/send-ostree-import-request.py
-
-            cosa init --force --branch ${ref} --commit=${fcos_config_commit} ${src_config_url}
             """)
+
+            // Needed until we backport https://github.com/coreos/coreos-assembler/pull/3036
+            if (params.STREAM == "master") {
+                shwrap("""
+                cosa init --force \
+                    --branch ${ref} \
+                    --yumrepos https://gitlab.cee.redhat.com/coreos/redhat-coreos \
+                    --commit=${fcos_config_commit} \
+                    ${src_config_url}
+                """)
+            } else {
+                shwrap("""
+                cosa init --force \
+                    --branch ${ref} \
+                    --commit=${fcos_config_commit} \
+                    ${src_config_url}
+                cosa shell -- git clone --depth 1 --branch ${params.STREAM= https://gitlab.cee.redhat.com/coreos/redhat-coreos src/yumrepos
+                cosa shell -- cp -t src/config src/yumrepos/{*.repo,content_sets*.yaml}
+                """)
+            }
 
         }
 
