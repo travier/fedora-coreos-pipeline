@@ -227,9 +227,34 @@ lock(resource: "build-${params.STREAM}-${params.ARCH}") {
                     /run/kubernetes/secrets/fedora-messaging-coreos-key
                 cosa remote-session sync {,:}/run/kubernetes/secrets/fedora-messaging-coreos-key/
             fi
+<<<<<<< HEAD
 
             cosa init --force --branch ${ref} --commit=${src_config_commit} ${src_config_url}
+=======
+            # sync over the send-ostree-import-request.py from the automation repo
+            cosa remote-session sync {,:}/var/tmp/fcos-releng/coreos-ostree-importer/send-ostree-import-request.py
+>>>>>>> f350057 (jobs/build-arch: Add repos after cosa init)
             """)
+
+            // Needed until we backport https://github.com/coreos/coreos-assembler/pull/3036
+            if (params.STREAM == "master") {
+                shwrap("""
+                cosa init --force \
+                    --branch ${ref} \
+                    --yumrepos https://gitlab.cee.redhat.com/coreos/redhat-coreos \
+                    --commit=${fcos_config_commit} \
+                    ${src_config_url}
+                """)
+            } else {
+                shwrap("""
+                cosa init --force \
+                    --branch ${ref} \
+                    --commit=${fcos_config_commit} \
+                    ${src_config_url}
+                cosa shell -- git clone --depth 1 --branch ${params.STREAM= https://gitlab.cee.redhat.com/coreos/redhat-coreos src/yumrepos
+                cosa shell -- cp -t src/config src/yumrepos/{*.repo,content_sets*.yaml}
+                """)
+            }
 
         }
 
