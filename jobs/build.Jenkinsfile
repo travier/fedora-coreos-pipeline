@@ -485,8 +485,7 @@ lock(resource: "build-${params.STREAM}") {
             // our pipeline environment.
             //
             // First, define a list of all the derivative artifacts for this architecture.
-            def artifacts = ["Aliyun", "AWS", "Azure", "AzureStack", "DigitalOcean", "Exoscale",
-                             "GCP", "IBMCloud", "Nutanix", "OpenStack", "VirtualBox", "VMware", "Vultr"]
+            def artifacts = pipecfg.artifacts."${basearch}".bootimages."${params.STREAM}"
             // For all architectures we need to build the metal/metal4k artifacts and the Live ISO. Since the
             // ISO depends on the Metal/Metal4k images we'll make sure to put the Metal* ones in the first run
             // and the Live ISO in the second run.
