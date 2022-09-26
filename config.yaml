@@ -109,6 +109,49 @@ artifacts:
         - Metal
         - OpenStack
         - PowerVs
+  s390x:
+    "4.6":
+      bootimages:
+        - Dasd
+        - Installer
+        - Metal
+        - OpenStack
+    "4.7":
+      bootimages:
+        - Dasd
+        - Installer
+        - Metal
+        - OpenStack
+    "4.8":
+      bootimages:
+        - Dasd
+        - Installer
+        - Metal
+        - OpenStack
+    "4.9":
+      bootimages:
+        - Dasd
+        - Installer
+        - Metal
+        - OpenStack
+    "4.10":
+      bootimages:
+        - Dasd
+        - Installer
+        - Metal
+        - OpenStack
+    "4.11":
+      bootimages:
+        - Dasd
+        - Installer
+        - Metal
+        - OpenStack
+    master:
+      bootimages:
+        - Dasd
+        - Installer
+        - Metal
+        - OpenStack
   x86_64:
     "4.6":
       bootimages:
