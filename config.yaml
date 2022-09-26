@@ -71,6 +71,44 @@ artifacts:
         - Installer
         - Metal
         - OpenStack
+  ppc64le:
+    "4.6":
+      bootimages:
+        - Installer
+        - Metal
+        - OpenStack
+    "4.7":
+      bootimages:
+        - Installer
+        - Metal
+        - OpenStack
+    "4.8":
+      bootimages:
+        - Installer
+        - Metal
+        - OpenStack
+    "4.9":
+      bootimages:
+        - Installer
+        - Metal
+        - OpenStack
+    "4.10":
+      bootimages:
+        - Installer
+        - Metal
+        - OpenStack
+    "4.11":
+      bootimages:
+        - Installer
+        - Metal
+        - OpenStack
+        - PowerVS
+    master:
+      bootimages:
+        - Installer
+        - Metal
+        - OpenStack
+        - PowerVs
   x86_64:
     "4.6":
       bootimages:
