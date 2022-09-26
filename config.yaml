@@ -39,6 +39,38 @@ source_config:
   url: https://github.com/openshift/os
 
 artifacts:
+  aarch64:
+    "4.8":
+      bootimages:
+        - AWS
+        - Installer
+        - Metal
+    "4.9":
+      bootimages:
+        - AWS
+        - Installer
+        - Metal
+        - OpenStack
+    "4.10":
+      bootimages:
+        - AWS
+        - Installer
+        - Metal
+        - OpenStack
+    "4.11":
+      bootimages:
+        - AWS
+        - Azure
+        - Installer
+        - Metal
+        - OpenStack
+    master:
+      bootimages:
+        - AWS
+        - Azure
+        - Installer
+        - Metal
+        - OpenStack
   x86_64:
     "4.6":
       bootimages:
