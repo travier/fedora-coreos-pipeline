@@ -107,6 +107,7 @@ pod = pod.replace("COREOS_ASSEMBLER_CPU_LIMIT", "${ncpus}")
 
 // substitute the right COSA image and mem request into the pod definition before spawning it
 pod = pod.replace("COREOS_ASSEMBLER_MEMORY_REQUEST", "${cosa_memory_request_mb}Mi")
+pod = pod.replace("COREOS_ASSEMBLER_MEMORY_LIMIT", "${cosa_memory_request_mb}Mi")
 pod = pod.replace("COREOS_ASSEMBLER_IMAGE", cosa_image)
 pod = pod.replace("JENKINS_AGENT_IMAGE_TAG", jenkins_agent_image_tag)
 
