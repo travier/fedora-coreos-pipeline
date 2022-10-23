@@ -1,89 +1,190 @@
 streams:
-    stable:
-      type: production
-    testing:
-      type: production
-    next:
-      type: production
-    testing-devel:
-      type: development
-      default: true
-    next-devel:         # do not touch; line managed by `next-devel/manage.py`
-      type: development # do not touch; line managed by `next-devel/manage.py`
-    rawhide:
+    "4.12":
       type: mechanical
-    # branched:
-    #  type: mechanical
-    # bodhi-updates:
-    #   type: mechanical
-    # bodhi-updates-testing:
-    #   type: mechanical
+      variants: []
+      source_config_ref: master
+      # the in-development RHCOS stream always uses :main until cosa is branched
+      cosa_img: quay.io/coreos-assembler/coreos-assembler:main
+    "4.11":
+      type: mechanical
+      skip_artifacts:
+        all:
+          - extensions-container
+          ## Needs to wait for oscontainer backports
+          - legacy-oscontainer
+        s390x:
+          - ibmcloud
+      # For multi-arch builds, we use `cosa remote-session`. However, that
+      # functionality hasn't been backported to 4.11 and older cosa branches. We
+      # recently did some golang migration [1] and happened to add the `cosa
+      # remote-session` pieces [2] after that migration. This makes it not easy
+      # to backport. For now, this hack knob allows us to use the latest COSA
+      # for the "outer" pod. We will still use the versioned COSA on the remote
+      # so the actual building will happen with the correctly versioned COSA
+      # (notice how the top-level `cosa_img` has `${STREAM}`).
+      # [1] https://github.com/coreos/coreos-assembler/pull/2919
+      # [2] https://github.com/coreos/coreos-assembler/pull/2979
+      cosa_controller_img_hack: quay.io/coreos-assembler/coreos-assembler:main
+    "4.10":
+      type: mechanical
+      skip_artifacts:
+        all:
+          - extensions-container
+          ## Needs to wait for oscontainer backports
+          - legacy-oscontainer
+        aarch64:
+          - azure
+        ppc64le:
+          - powervs
+        s390x:
+          - ibmcloud
+      cosa_controller_img_hack: quay.io/coreos-assembler/coreos-assembler:main
+    "4.9":
+      type: mechanical
+      additional_artifacts:
+        all:
+          - legacy-oscontainer
+      skip_artifacts:
+        all:
+          - extensions-container
+        aarch64:
+          - azure
+        ppc64le:
+          - powervs
+        s390x:
+          - ibmcloud
+        x86_64:
+          - aliyun
+          - nutanix
+      cosa_controller_img_hack: quay.io/coreos-assembler/coreos-assembler:main
+    "4.8":
+      type: mechanical
+      additional_artifacts:
+        all:
+          - legacy-oscontainer
+      skip_artifacts:
+        all:
+          - extensions-container
+        aarch64:
+          - azure
+          - openstack
+        ppc64le:
+          - powervs
+        s390x:
+          - ibmcloud
+        x86_64:
+          - aliyun
+          - azurestack
+          - nutanix
+      cosa_controller_img_hack: quay.io/coreos-assembler/coreos-assembler:main
+    "4.7":
+      type: mechanical
+      additional_artifacts:
+        all:
+          - legacy-oscontainer
+      skip_artifacts:
+        all:
+          - extensions-container
+        ppc64le:
+          - powervs
+        s390x:
+          - ibmcloud
+        x86_64:
+          - aliyun
+          - azurestack
+          - nutanix
+      cosa_controller_img_hack: quay.io/coreos-assembler/coreos-assembler:main
+    "4.6":
+      type: mechanical
+      additional_artifacts:
+        all:
+          - legacy-oscontainer
+      skip_artifacts:
+        all:
+          - extensions-container
+        ppc64le:
+          - powervs
+        s390x:
+          - ibmcloud
+        x86_64:
+          - aliyun
+          - azurestack
+          - ibmcloud
+          - nutanix
+      cosa_controller_img_hack: quay.io/coreos-assembler/coreos-assembler:main
+
+cosa_img: quay.io/coreos-assembler/staging:rhcos-${STREAM}-new
 
 additional_arches: [aarch64, ppc64le, s390x]
 
 source_config:
-  url: https://github.com/coreos/fedora-coreos-config
-
-s3:
-  bucket: fcos-builds
-  # see bucket layout in https://github.com/coreos/fedora-coreos-tracker/issues/189
-  builds_key: "prod/streams/${STREAM}"
-
-registry_repos:
-  oscontainer: quay.io/fedora/fedora-coreos
-
-versionary_hack: true
+  url: https://github.com/dustymabe/os
+  ref: release-${STREAM}
+  yumrepos: https://gitlab.cee.redhat.com/coreos/redhat-coreos.git
 
 default_artifacts:
   all:
+    - extensions-container
+    - legacy-oscontainer
+    - live
     - metal
     - metal4k
-    - live
     - openstack
   aarch64:
+    - aws
     - azure
   ppc64le:
     - powervs
   s390x:
+    - dasd
     - ibmcloud
   x86_64:
     - aliyun
     - aws
     - azure
     - azurestack
-    - digitalocean
-    - exoscale
     - gcp
     - ibmcloud
     - nutanix
-    - virtualbox
     - vmware
-    - vultr
 
-# Temporary hack for AWS aarch64; see comment in `build-arch.Jenkinsfile`.
-aws_aarch64_serial_console_hack: true
+s3:
+  bucket: rhcos-ci
+  builds_key: "prod/streams/${STREAM}"
+
+registry_repos:
+  oscontainer: quay.io/openshift-release-dev/rhel-coreos-dev
+  oscontainer_old: registry.ci.openshift.org/rhcos-devel/machine-os-oci-content
+  legacy_oscontainer: quay.io/openshift-release-dev/rhel-coreos-dev
+  legacy_oscontainer_old: registry.ci.openshift.org/rhcos-devel/machine-os-content
+  extensions: quay.io/openshift-release-dev/rhel-coreos-dev
+  add_build_tag: true
+  v2s2: true
 
 clouds:
-  aws:
-    bucket: fcos-builds/ami-import
+  aliyun:
+    bucket: rhcos-devel
     primary_region: us-east-1
-    # we make our images public in the release job via plume
+  aws:
+    bucket: rhcos-ci/testing/amis
+    primary_region: us-east-1
+    # Our development stream doesn't need to be public, and things are
+    # a lot easier if it's not by default.
     public: false
-    # Accounts to share newly created AMIs with
-    test_accounts:
-      - "013116697141"
+    # We don't have proper credentials for govcloud yet
+    # govcloud:
+    #   bucket: rh-openshift-rhcos-govcloud-prod-vmimport-art-upload
+    #   # s3 bucket is located in us-gov-west-1
+    #   primary_region: us-gov-west-1
+    #   # Our development stream doesn't need to be public, and things are
+    #   # a lot easier if it's not by default.
+    #   public: false
   azure:
-    test_resource_group: fedora-coreos-testing
-    test_storage_account: fedoracoreostesting
-    test_storage_container: fedora-coreos-testing-image-blobs
-    test_architectures: [x86_64]
+    resource_group: os4-common
+    storage_account: rhcoshorcruxes
+    storage_container: imagebucket
   gcp:
-    bucket: fedora-coreos-cloud-image-uploads/image-import
-    description: "Fedora, Fedora CoreOS ${STREAM}, ${BUILDID}, ${BASEARCH} published on ${DATE}"
-    family: "fedora-coreos-${STREAM}"
+    bucket: rhcos-devel/devel/rhcos
     public: true
     licenses:
-      - "fedora-coreos-${STREAM}"
       - "https://compute.googleapis.com/compute/v1/projects/vm-options/global/licenses/enable-vmx"
-  openstack:
-    test_architectures: [x86_64, aarch64]
