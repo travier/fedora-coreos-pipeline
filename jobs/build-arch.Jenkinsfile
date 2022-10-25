@@ -284,6 +284,7 @@ lock(resource: "build-${params.STREAM}-${basearch}") {
             def n = 4 // VMs are 2G each and arch builders have approx 32G
             kola(cosaDir: env.WORKSPACE, parallel: n, arch: basearch,
                  skipUpgrade: true,
+                 extraArgs: 'coreos.selinux.enforce',
                  allowUpgradeFail: params.ALLOW_KOLA_UPGRADE_FAILURE,
                  skipSecureBoot: pipecfg.hotfix?.skip_secureboot_tests_hack)
         }
