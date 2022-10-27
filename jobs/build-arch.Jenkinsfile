@@ -319,13 +319,13 @@ lock(resource: "build-${params.STREAM}-${basearch}") {
             }
         }
 
-        // Run Kola TestISO tests for metal artifacts
-        if (shwrapCapture("cosa meta --get-value images.live-iso") != "None") {
-            stage("Kola:TestISO") {
-                kolaTestIso(cosaDir: env.WORKSPACE, arch: basearch,
-                            skipSecureBoot: pipecfg.hotfix?.skip_secureboot_tests_hack)
-            }
-        }
+//      // Run Kola TestISO tests for metal artifacts
+//      if (shwrapCapture("cosa meta --get-value images.live-iso") != "None") {
+//          stage("Kola:TestISO") {
+//              kolaTestIso(cosaDir: env.WORKSPACE, arch: basearch,
+//                          skipSecureBoot: pipecfg.hotfix?.skip_secureboot_tests_hack)
+//          }
+//      }
 
         // Upload to relevant clouds
         if (uploading) {
