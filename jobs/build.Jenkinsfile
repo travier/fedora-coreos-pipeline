@@ -117,10 +117,19 @@ lock(resource: "build-${params.STREAM}") {
         stage('Init') {
             // for now, just use the PVC to keep cache.qcow2 in a stream-specific dir
             def cache_img = "/srv/prod/${params.STREAM}/cache.qcow2"
-            def yumrepos = pipecfg.source_config.yumrepos ? "--yumrepos ${pipecfg.source_config.yumrepos}" : ""
+            //def yumrepos = pipecfg.source_config.yumrepos ? "--yumrepos ${pipecfg.source_config.yumrepos}" : ""
+            //def yumrepos = pipecfg.source_config.yumrepos ? "--yumrepos ${pipecfg.source_config.yumrepos}" : ""
+            def yumrepos_ref = params.STREAM
+            if (yumrepos_ref == '4.12') {
+                yumrepos_ref = 'master'
+            }
+
 
             shwrap("""
-            cosa init --force --branch ${ref} --commit=${src_config_commit} ${yumrepos} ${pipecfg.source_config.url}
+            cosa shell -- mkdir ./yumrepos
+            cosa shell -- git clone --depth=1 --branch=${yumrepos_ref} ${pipecfg.source_config.yumrepos} ./yumrepos
+            yumrepos=\$(cosa shell -- readlink -f ./yumrepos)
+            cosa init --force --branch ${ref} --commit=${src_config_commit} --yumrepos=\${yumrepos} ${pipecfg.source_config.url}
             mkdir -p \$(dirname ${cache_img})
             ln -s ${cache_img} cache/cache.qcow2
             """)

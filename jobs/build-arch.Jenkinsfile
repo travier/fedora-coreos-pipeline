@@ -143,10 +143,18 @@ lock(resource: "build-${params.STREAM}-${basearch}") {
         }
 
         stage('Init') {
-            def yumrepos = pipecfg.source_config.yumrepos ? "--yumrepos ${pipecfg.source_config.yumrepos}" : ""
+            //def yumrepos = pipecfg.source_config.yumrepos ? "--yumrepos ${pipecfg.source_config.yumrepos}" : ""
+            def yumrepos_ref = params.STREAM
+            if (yumrepos_ref == '4.12') {
+                yumrepos_ref = 'master'
+            }
+
 
             shwrap("""
-            cosa init --force --branch ${ref} --commit=${src_config_commit} ${yumrepos} ${pipecfg.source_config.url}
+            cosa shell -- mkdir ./yumrepos
+            cosa shell -- git clone --depth=1 --branch=${yumrepos_ref} ${pipecfg.source_config.yumrepos} ./yumrepos
+            yumrepos=\$(cosa shell -- readlink -f ./yumrepos)
+            cosa init --force --branch ${ref} --commit=${src_config_commit} --yumrepos=\${yumrepos} ${pipecfg.source_config.url}
             """)
 
         }
