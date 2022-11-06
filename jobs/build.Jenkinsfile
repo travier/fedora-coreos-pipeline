@@ -253,18 +253,18 @@ lock(resource: "build-${params.STREAM}") {
         // A few independent tasks that can be run in parallel
         def parallelruns = [:]
 
-        // Generate KeyLime hashes for attestation on builds
-        // This is a POC setup and will be modified over time
-        // See: https://github.com/keylime/enhancements/blob/master/16_remote_allowlist_retrieval.md
-        parallelruns['KeyLime Hash Generation'] = {
-            shwrap("""
-            cosa generate-hashlist --arch=${basearch} --release=${newBuildID} \
-                --output=builds/${newBuildID}/${basearch}/exp-hash.json
-            source="builds/${newBuildID}/${basearch}/exp-hash.json"
-            target="builds/${newBuildID}/${basearch}/exp-hash.json-CHECKSUM"
-            cosa shell -- bash -c "sha256sum \$source > \$target"
-            """)
-        }
+      //// Generate KeyLime hashes for attestation on builds
+      //// This is a POC setup and will be modified over time
+      //// See: https://github.com/keylime/enhancements/blob/master/16_remote_allowlist_retrieval.md
+      //parallelruns['KeyLime Hash Generation'] = {
+      //    shwrap("""
+      //    cosa generate-hashlist --arch=${basearch} --release=${newBuildID} \
+      //        --output=builds/${newBuildID}/${basearch}/exp-hash.json
+      //    source="builds/${newBuildID}/${basearch}/exp-hash.json"
+      //    target="builds/${newBuildID}/${basearch}/exp-hash.json-CHECKSUM"
+      //    cosa shell -- bash -c "sha256sum \$source > \$target"
+      //    """)
+      //}
 
         // Build QEMU image
         parallelruns['Build QEMU'] = {
