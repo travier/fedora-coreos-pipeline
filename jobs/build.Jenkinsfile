@@ -286,7 +286,6 @@ lock(resource: "build-${params.STREAM}") {
             def n = ncpus - 1 // remove 1 for upgrade test
             kola(cosaDir: env.WORKSPACE, parallel: n, arch: basearch,
                  skipUpgrade: true,
-                 extraArgs: 'coreos.selinux.enforce',
                  allowUpgradeFail: params.ALLOW_KOLA_UPGRADE_FAILURE,
                  skipSecureBoot: pipecfg.hotfix?.skip_secureboot_tests_hack)
         }
