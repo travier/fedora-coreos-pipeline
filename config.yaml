@@ -32,6 +32,10 @@ streams:
           - extensions-container
           ## Needs to wait for oscontainer backports
           - legacy-oscontainer
+          ## skip for now while I test
+          - live
+          - metal
+          - metal4k
         aarch64:
           - azure
         ppc64le:
