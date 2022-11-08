@@ -1,9 +1,15 @@
 streams:
-    "4.12":
+    "4.13":
       type: mechanical
       variants: []
       source_config_ref: master
       # the in-development RHCOS stream always uses :main until cosa is branched
+      cosa_img: quay.io/coreos-assembler/coreos-assembler:main
+    "4.12":
+      type: mechanical
+      variants: []
+      source_config_ref: master
+      # TODO: Branch COSA when we're ready
       cosa_img: quay.io/coreos-assembler/coreos-assembler:main
     "4.11":
       type: mechanical
